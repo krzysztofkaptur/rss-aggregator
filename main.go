@@ -5,9 +5,13 @@ import (
 	"net/http"
 	"os"
 
+	"github.com/krzysztofkaptur/rss-aggregator/internal/database"
 	_ "github.com/lib/pq"
 )
 
+type apiConfig struct {
+	DB *database.Queries
+}
 
 func main() {
 	InitEnv()
@@ -17,19 +21,17 @@ func main() {
 		log.Fatal(err)
 	}
 
+	apiCfg := apiConfig{
+		DB: store,
+	}
+
 	router := http.NewServeMux()
 
-	router.HandleFunc("GET /api/v1/healthz", handlerReadiness)
-	router.HandleFunc("GET /api/v1/error", handlerError)
+	router.HandleFunc("GET /api/v1/healthz", apiCfg.handlerReadiness)
+	router.HandleFunc("GET /api/v1/error", apiCfg.handlerError)
 
-	router.HandleFunc("GET /api/v1/users", func (w http.ResponseWriter, r *http.Request) {
-		users, err := store.FetchUsers(r.Context())
-		if err != nil {
-			log.Fatal(err)
-		}
-
-		WriteJSON(w, http.StatusOK, users)
-	})
+	router.HandleFunc("GET /api/v1/users", apiCfg.handleFetchUsers)
+	router.HandleFunc("POST /api/v1/users", apiCfg.handleCreateUser)
 
 	server := &http.Server{
 		Handler: router,
