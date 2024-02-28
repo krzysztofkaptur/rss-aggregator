@@ -32,6 +32,7 @@ func main() {
 
 	router.HandleFunc("GET /api/v1/users", apiCfg.handleFetchUsers)
 	router.HandleFunc("POST /api/v1/users", apiCfg.handleCreateUser)
+	router.HandleFunc("GET /api/v1/users/{apiKey}", apiCfg.handleFetchUser)
 
 	server := &http.Server{
 		Handler: router,

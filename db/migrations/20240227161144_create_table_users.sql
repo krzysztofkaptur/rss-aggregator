@@ -1,10 +1,10 @@
 -- +goose Up
--- add unique for email
--- add created_at and updated_at
--- create apikey
 CREATE TABLE users (
   id SERIAL PRIMARY KEY,
-  email VARCHAR(50) NOT NULL
+  email VARCHAR(50) UNIQUE NOT NULL,
+  created_at TIMESTAMP WITH TIME ZONE DEFAULT CURRENT_TIMESTAMP,
+  updated_at TIMESTAMP WITH TIME ZONE DEFAULT CURRENT_TIMESTAMP,
+  api_key VARCHAR(64) UNIQUE NOT NULL DEFAULT (encode(sha256(random()::text::bytea), 'hex'))
 );
 
 -- +goose Down

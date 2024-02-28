@@ -4,9 +4,14 @@
 
 package database
 
-import ()
+import (
+	"database/sql"
+)
 
 type User struct {
-	ID    int32  `json:"id"`
-	Email string `json:"email"`
+	ID        int32        `json:"id"`
+	Email     string       `json:"email"`
+	CreatedAt sql.NullTime `json:"created_at"`
+	UpdatedAt sql.NullTime `json:"updated_at"`
+	ApiKey    string       `json:"api_key"`
 }
