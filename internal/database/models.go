@@ -6,7 +6,26 @@ package database
 
 import (
 	"database/sql"
+	"time"
 )
+
+type Feed struct {
+	ID            int32        `json:"id"`
+	CreatedAt     time.Time    `json:"created_at"`
+	UpdatedAt     time.Time    `json:"updated_at"`
+	Name          string       `json:"name"`
+	Url           string       `json:"url"`
+	UserID        int32        `json:"user_id"`
+	LastFetchedAt sql.NullTime `json:"last_fetched_at"`
+}
+
+type FeedFollow struct {
+	ID        int32     `json:"id"`
+	CreatedAt time.Time `json:"created_at"`
+	UpdatedAt time.Time `json:"updated_at"`
+	UserID    int32     `json:"user_id"`
+	FeedID    int32     `json:"feed_id"`
+}
 
 type User struct {
 	ID        int32        `json:"id"`

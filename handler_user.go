@@ -3,26 +3,25 @@ package main
 import (
 	"encoding/json"
 	"fmt"
-	"log"
 	"net/http"
 
-	"github.com/krzysztofkaptur/rss-aggregator/internal/auth"
+	"github.com/krzysztofkaptur/rss-aggregator/internal/database"
 )
 
 type createUserParams struct {
 	Email string `json:"email"`
 } 
 
-func (apiCfg *apiConfig) handleFetchUsers(w http.ResponseWriter, r *http.Request) {
-	users, err := apiCfg.DB.FetchUsers(r.Context())
+// func (apiCfg *apiConfig) handleFetchUsers(w http.ResponseWriter, r *http.Request) {
+// 	users, err := apiCfg.DB.FetchUsers(r.Context())
 
-	if err != nil {
-		// TODO: handle errors with ResponseWithError
-		log.Fatal(err)
-	}
+// 	if err != nil {
+// 		// TODO: handle errors with ResponseWithError
+// 		log.Fatal(err)
+// 	}
 
-	WriteJSON(w, http.StatusOK, users)
-}
+// 	WriteJSON(w, http.StatusOK, users)
+// }
 
 func (apiCfg *apiConfig) handleCreateUser(w http.ResponseWriter, r *http.Request) {
 	createUserPar := createUserParams{}
@@ -43,20 +42,6 @@ func (apiCfg *apiConfig) handleCreateUser(w http.ResponseWriter, r *http.Request
 	WriteJSON(w, http.StatusCreated, user)
 }
 
-func (apiCfg *apiConfig) handleFetchUser(w http.ResponseWriter, r *http.Request) {
-	apiKey, err := auth.GetAPIKey(r.Header)
-	if err != nil {
-		// TODO: handle errors with ResponseWithError
-		fmt.Println("wrong api key")
-		return
-	}
-
-	user, err := apiCfg.DB.GetUserByAPIKey(r.Context(), apiKey)
-	if err != nil {
-		// TODO: handle errors with ResponseWithError 
-		fmt.Println("user doesn't exist")
-		return
-	}
-
+func (apiCfg *apiConfig) handleFetchUser(w http.ResponseWriter, r *http.Request, user database.User) {
 	WriteJSON(w, http.StatusOK, user)
 }

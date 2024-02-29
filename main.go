@@ -27,12 +27,23 @@ func main() {
 
 	router := http.NewServeMux()
 
+	// examples
 	router.HandleFunc("GET /api/v1/healthz", apiCfg.handlerReadiness)
 	router.HandleFunc("GET /api/v1/error", apiCfg.handlerError)
 
-	router.HandleFunc("GET /api/v1/users", apiCfg.handleFetchUsers)
+	// users
 	router.HandleFunc("POST /api/v1/users", apiCfg.handleCreateUser)
-	router.HandleFunc("GET /api/v1/users/{apiKey}", apiCfg.handleFetchUser)
+	router.HandleFunc("GET /api/v1/users", apiCfg.middlewareAuth(apiCfg.handleFetchUser))
+
+	// feeds
+	router.HandleFunc("GET /api/v1/feeds", apiCfg.handleFetchFeeds)
+	router.HandleFunc("POST /api/v1/feeds", apiCfg.middlewareAuth(apiCfg.handleCreateFeed))
+	
+	// feed follows
+	router.HandleFunc("GET /api/v1/feed-follow", apiCfg.middlewareAuth(apiCfg.handleFetchFeedFollows))
+	router.HandleFunc("POST /api/v1/feed-follow", apiCfg.middlewareAuth(apiCfg.handleCreateFeedFollow))
+	router.HandleFunc("DELETE /api/v1/feed-follow/{feedId}", apiCfg.middlewareAuth(apiCfg.handleDeleteFeedFollow))
+
 
 	server := &http.Server{
 		Handler: router,
