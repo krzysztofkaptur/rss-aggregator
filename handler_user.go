@@ -45,3 +45,17 @@ func (apiCfg *apiConfig) handleCreateUser(w http.ResponseWriter, r *http.Request
 func (apiCfg *apiConfig) handleFetchUser(w http.ResponseWriter, r *http.Request, user database.User) {
 	WriteJSON(w, http.StatusOK, user)
 }
+
+func (apiCfg *apiConfig) handleFetchPostsForUser(w http.ResponseWriter, r *http.Request, user database.User) {
+	posts, err := apiCfg.DB.FetchPostsForUser(r.Context(), database.FetchPostsForUserParams{
+		UserID: user.ID,
+		Limit: 10,
+	})
+	if err != nil {
+		// TODO: handle errors with ResponseWithError
+		fmt.Println("something wrong while fetching posts")
+		return
+	}
+
+	WriteJSON(w, http.StatusOK, posts)
+} 

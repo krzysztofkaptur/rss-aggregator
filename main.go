@@ -4,6 +4,7 @@ import (
 	"log"
 	"net/http"
 	"os"
+	"time"
 
 	"github.com/krzysztofkaptur/rss-aggregator/internal/database"
 	_ "github.com/lib/pq"
@@ -15,15 +16,19 @@ type apiConfig struct {
 
 func main() {
 	InitEnv()
+
 	
 	store, err := InitDB()
 	if err != nil {
 		log.Fatal(err)
 	}
-
+	
+	
 	apiCfg := apiConfig{
 		DB: store,
 	}
+	
+	go startScraping(store, 10, time.Minute)
 
 	router := http.NewServeMux()
 
@@ -34,6 +39,7 @@ func main() {
 	// users
 	router.HandleFunc("POST /api/v1/users", apiCfg.handleCreateUser)
 	router.HandleFunc("GET /api/v1/users", apiCfg.middlewareAuth(apiCfg.handleFetchUser))
+	router.HandleFunc("GET /api/v1/users/posts", apiCfg.middlewareAuth(apiCfg.handleFetchPostsForUser))
 
 	// feeds
 	router.HandleFunc("GET /api/v1/feeds", apiCfg.handleFetchFeeds)
@@ -43,7 +49,6 @@ func main() {
 	router.HandleFunc("GET /api/v1/feed-follow", apiCfg.middlewareAuth(apiCfg.handleFetchFeedFollows))
 	router.HandleFunc("POST /api/v1/feed-follow", apiCfg.middlewareAuth(apiCfg.handleCreateFeedFollow))
 	router.HandleFunc("DELETE /api/v1/feed-follow/{feedId}", apiCfg.middlewareAuth(apiCfg.handleDeleteFeedFollow))
-
 
 	server := &http.Server{
 		Handler: router,
